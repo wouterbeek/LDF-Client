@@ -4,4 +4,4 @@ keywords(['API',client,'LDF','Linked Data Fragments']).
 name(ldf_client).
 requires(rdf_client).
 title('A Linked Data Fragment (LDF) Client for SWI-Prolog.').
-version('0.0.1').
+version('0.0.2').
