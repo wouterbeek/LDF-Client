@@ -107,8 +107,11 @@ ldf_request(Uri1, S, P1, O) :-
   partition(ldf_is_meta_quad, Quads, MetaQuads, DataQuads),
   (   member(rdf(S,P1,O,_), DataQuads)
   ;   % Check whether there is a next page with more results.
-      rdf_equal(hydra:next, P2),
-      memberchk(rdf(_,P2,Uri2,_), MetaQuads),
+      once((
+        % @compat Look for both the current and the legacy property.
+        (rdf_equal(hydra:next, P2) ; rdf_equal(hydra:nextPage, P2)),
+        memberchk(rdf(_,P2,Uri2,_), MetaQuads)
+      )),
       ldf_request(Uri2, S, P1, O)
   ).
 
