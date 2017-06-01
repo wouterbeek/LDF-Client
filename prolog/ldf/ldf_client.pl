@@ -11,10 +11,11 @@
 /** <module> Linked Data Fragments (LDF) client
 
 @author Wouter Beek
-@version 2017/05
+@version 2017/05-2017/06
 */
 
 :- use_module(library(apply)).
+:- use_module(library(error)).
 :- use_module(library(lists)).
 :- use_module(library(semweb/rdf_client)).
 :- use_module(library(settings)).
@@ -45,6 +46,9 @@ ldf(S, P, O) :-
   ldf(S, P, O, Endpoint).
 
 
+ldf(_, _, _, Endpoint) :-
+  var(Endpoint), !,
+  instantiation_error(Endpoint).
 ldf(S, P, O, Endpoint) :-
   ldf_request_uri(S, P, O, Endpoint, Uri),
   ldf_request(Uri, S, P, O).
@@ -130,4 +134,4 @@ ldf_request_uri(S, P, O, Endpoint, Uri) :-
     [SParam,PParam,OParam]
   ),
   include(ground, [SParam,PParam,OParam], QueryComps),
-  uri_comps(Uri, uri(Scheme,Auth,Segments,QueryComps,_)).
+  uri_comps(Uri, uri(Scheme,Auth,Segments,[page_size(100)|QueryComps],_)).
