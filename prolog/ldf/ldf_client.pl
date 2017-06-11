@@ -17,7 +17,7 @@
 :- use_module(library(apply)).
 :- use_module(library(error)).
 :- use_module(library(lists)).
-:- use_module(library(semweb/rdf_client)).
+:- use_module(library(semweb/rdf_ext)).
 :- use_module(library(settings)).
 :- use_module(library(uri/uri_ext)).
 
