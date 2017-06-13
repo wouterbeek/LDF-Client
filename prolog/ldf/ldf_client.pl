@@ -30,8 +30,8 @@
 :- setting(
      endpoint,
      atom,
-     'http://fragments.dbpedia.org/2016-04/en',
-     "The endpoint that is used by ldf/3 and ldf_estimate/4."
+     'http://webscale.cc:3001/LOD-a-lot',
+     "The default endpoint that is used by ldf/3 and ldf_estimate/4."
    ).
 
 
