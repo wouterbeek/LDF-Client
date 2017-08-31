@@ -1,17 +1,15 @@
 :- module(
   ldf_client,
   [
-    ldf/3,          % ?S, ?P, ?O
-    ldf/4,          % ?S, ?P, ?O, +Endpoint
-    ldf_estimate/4, % ?S, ?P, ?O,            -NumTriples
-    ldf_estimate/5  % ?S, ?P, ?O, +Endpoint, -NumTriples
+    ldf/4,         % +Endpoint, ?S, ?P, ?O
+    ldf_estimate/5 % +Endpoint, ?S, ?P, ?O, -NumTriples
   ]
 ).
 
 /** <module> Linked Data Fragments (LDF) client
 
 @author Wouter Beek
-@version 2017/05-2017/06
+@version 2017/05-2017/08
 */
 
 :- use_module(library(apply)).
@@ -22,48 +20,25 @@
 :- use_module(library(uri/uri_ext)).
 
 :- rdf_meta
-   ldf(r, r, o),
-   ldf(r, r, o, r),
-   ldf_estimate(r, r, o, -),
-   ldf_estimate(r, r, o, r, -).
-
-:- setting(
-     endpoint,
-     atom,
-     'http://webscale.cc:3001/LOD-a-lot',
-     "The default endpoint that is used by ldf/3 and ldf_estimate/4."
-   ).
+   ldf(+, r, r, o),
+   ldf_estimate(+, r, r, o, -).
 
 
 
 
 
-%! ldf(?S, ?P, ?O) is nondet.
-%! ldf(?S, ?P, ?O, +Endpoint) is nondet.
-
-ldf(S, P, O) :-
-  setting(endpoint, Endpoint),
-  ldf(S, P, O, Endpoint).
-
-
-ldf(_, _, _, Endpoint) :-
+ldf(Endpoint, _, _, _) :-
   var(Endpoint), !,
   instantiation_error(Endpoint).
-ldf(S, P, O, Endpoint) :-
-  ldf_request_uri(S, P, O, Endpoint, Uri),
+ldf(Endpoint, S, P, O) :-
+  ldf_request_uri(Endpoint, S, P, O, Uri),
   ldf_request(Uri, S, P, O).
 
 
 
-%! ldf_estimate(?S, ?P, ?O, -NumTriples) is det.
-%! ldf_estimate(?S, ?P, ?O, +Endpoint, -NumTriples) is det.
+%! ldf_estimate(+Endpoint, ?S, ?P, ?O, -NumTriples) is det.
 
-ldf_estimate(S, P, O, NumTriples) :-
-  setting(endpoint, Endpoint),
-  ldf_estimate(S, P, O, Endpoint, NumTriples).
-
-
-ldf_estimate(S, P1, O, Endpoint, NumTriples) :-
+ldf_estimate(Endpoint, S, P1, O, NumTriples) :-
   ldf_request_uri(S, P1, O, Endpoint, Uri),
   rdf_deref_quads(Uri, Quads, [media_type(media(application/trig,[]))]),
   include(ldf_is_meta_quad, Quads, MetaQuads),
@@ -121,7 +96,7 @@ ldf_request(Uri1, S, P1, O) :-
 
 
 
-%! ldf_request_uri(?S, ?P, ?O, +Endpoint, -Uri) is det.
+%! ldf_request_uri(+Endpoint, ?S, ?P, ?O, -Uri) is det.
 %
 % An URI that implements a Linked Triple Fragments request.
 
