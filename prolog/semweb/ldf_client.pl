@@ -15,7 +15,7 @@
 :- use_module(library(apply)).
 :- use_module(library(error)).
 :- use_module(library(http/http_open)).
-:- use_module(library(semweb/rdf_db)).
+:- use_module(library(semweb/rdf11)).
 :- use_module(library(semweb/turtle)).
 :- use_module(library(uri)).
 
@@ -79,9 +79,15 @@ ldf_parameter(Key, Literal, Key=Value) :-
   (   Literal = literal(ltag(LTag,Lex))
   ->  format(atom(Value), '"~a"@~a', [Lex,LTag])
   ;   Literal = literal(type(D,Lex))
-  ->  format(atom(Value), '"~a"^^~a', [Lex,D])
+  ->  format(atom(Value), '"~a"^^<~a>', [Lex,D])
   ).
-ldf_parameter(Key, Value, Key=Value).
+ldf_parameter(Key, Iri, Key=Value) :-
+  rdf_is_iri(Iri), !,
+  format(atom(Value), '<~a>', [Iri]).
+ldf_parameter(Key, BNode, Key=BNode) :-
+  rdf_is_iri(BNode), !.
+ldf_parameter(_, Term, _) :-
+  type_error(rdf_term, Term).
 
 
 
